@@ -10,9 +10,12 @@ class GrammarParse(unittest.TestCase):
 
     def try_parse_all(self, rule, items):
         for i in items:
-            # print(i)
-            r = grammar[rule].parse(i)
-            # print(r)
+            try:
+                r = grammar[rule].parse(i)
+                # print(r)
+            except:
+                print('Starting at rule "{}", failed to parse:\n{}'.format(rule, i))
+                raise
 
     def test_header(self):
         headers = [d[0] for d in self.test_data]
@@ -38,9 +41,9 @@ class GrammarParse(unittest.TestCase):
         clines = [d[d.find('C)'):] for d in clines]
         self.try_parse_all('c_clause', clines)
 
-    def test_dclause(self):
-        dlines = [d[3] for d in self.test_data if d[3].startswith('D)')]
-        self.try_parse_all('d_clause', dlines)
+    def test_root(self):
+        notams = ['\n'.join(d) for d in self.test_data]
+        self.try_parse_all('root', notams)
 
 
 if __name__ == '__main__':
