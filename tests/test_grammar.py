@@ -38,6 +38,10 @@ class GrammarParse(unittest.TestCase):
         clines = [d[d.find('C)'):] for d in clines]
         self.try_parse_all('c_clause', clines)
 
+    def test_dclause(self):
+        dlines = [d[3] for d in self.test_data if d[3].startswith('D)')]
+        self.try_parse_all('d_clause', dlines)
+
 
 if __name__ == '__main__':
     unittest.main()

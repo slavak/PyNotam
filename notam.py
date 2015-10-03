@@ -25,9 +25,11 @@ grammar = parsimonious.Grammar(r"""
     estimated = "EST"
     permanent = "PERM"
 
+    d_clause = "D)" _ ~r".*?(?=(?:$)|(?: E\)))"m
+
     _ = " "
     icao_id = ~r"[A-Z]{4}"
     datetime = int2 int2 int2 int2 int2 # year month day hours minutes
-    int3 = ~r"[0-9]{3}"
     int2 = ~r"[0-9]{2}"
+    int3 = ~r"[0-9]{3}"
 """)
