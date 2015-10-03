@@ -1,6 +1,8 @@
 import parsimonious
 
 grammar = parsimonious.Grammar(r"""
+    root = "(" header __ q_clause __ a_clause __ b_clause __ c_clause __ (d_clause __)? e_clause (__ f_clause __ g_clause)? ")"
+
     header = notamn_header / notamr_header / notamc_header
     notamn_header = notam_id _ "NOTAMN"
     notamr_header = notam_id _ "NOTAMR" _ notam_id
@@ -25,11 +27,20 @@ grammar = parsimonious.Grammar(r"""
     estimated = "EST"
     permanent = "PERM"
 
-    d_clause = "D)" _ ~r".*?(?=(?:$)|(?: E\)))"m
+    d_clause = "D)" _ till_next_clause
+
+    e_clause = "E)" _ till_next_clause
+
+    f_clause = "F)" _ (gnd / till_next_clause)
+    g_clause = "G)" _ (unl / till_next_clause)
+    gnd = "GND" / "SFC"
+    unl = "UNL"
 
     _ = " "
+    __ = " " / "\n"
     icao_id = ~r"[A-Z]{4}"
     datetime = int2 int2 int2 int2 int2 # year month day hours minutes
     int2 = ~r"[0-9]{2}"
     int3 = ~r"[0-9]{3}"
+    till_next_clause = ~r".*?(?=(?:\)$)|(?:\s[A-Z]\)))"s
 """)
