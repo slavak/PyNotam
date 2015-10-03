@@ -19,7 +19,7 @@ grammar = parsimonious.Grammar(r"""
     upper_limit = int3
     area_of_effect = ~r"(?P<lat>[0-9]{4}[NS])(?P<long>[0-9]{5}[EW])(?P<radius>[0-9]{3})"
 
-    a_clause = "A)" _ location_icao
+    a_clause = "A)" _ location_icao ("/" location_icao)*
     location_icao = icao_id
 
     b_clause = "B)" _ datetime
