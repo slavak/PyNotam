@@ -1,5 +1,5 @@
 import unittest
-from notam import grammar
+from _parser import grammar
 from test_helper import read_test_data
 
 
