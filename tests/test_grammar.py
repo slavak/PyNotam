@@ -19,11 +19,11 @@ class GrammarParse(unittest.TestCase):
 
     def test_header(self):
         headers = [d[0] for d in self.test_data]
-        headers = [h[1:] for h in headers] # remove opening parenthesis
+        headers = [h[1:].strip() for h in headers] # remove opening parenthesis
         self.try_parse_all('header', headers)
 
     def test_qclause(self):
-        qlines = [d[1] for d in self.test_data]
+        qlines = [d[1].strip() for d in self.test_data]
         self.try_parse_all('q_clause', qlines)
 
     def test_aclause(self):
@@ -33,12 +33,12 @@ class GrammarParse(unittest.TestCase):
 
     def test_bclause(self):
         blines = [d[2] for d in self.test_data]
-        blines = [d[d.find('B)'):d.find(' C)')] for d in blines]
+        blines = [d[d.find('B)'):d.find(' C)')] for d in blines if 'B)' in d]
         self.try_parse_all('b_clause', blines)
 
     def test_cclause(self):
         clines = [d[2] for d in self.test_data]
-        clines = [d[d.find('C)'):] for d in clines]
+        clines = [d[d.find('C)'):] for d in clines if 'C)' in d]
         self.try_parse_all('c_clause', clines)
 
     def test_root(self):
