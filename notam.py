@@ -61,11 +61,15 @@ class EstimatedDateTime(datetime.datetime):
         return v
 
 class NotamParseVisitor(parsimonious.NodeVisitor):
-    def has_descendant(self, node, desc_name):
+    grammar = grammar
+
+    @staticmethod
+    def has_descendant(node, desc_name):
         if node.expr_name == desc_name: return True
-        else: return any([self.has_descendant(c,desc_name) for c in node.children])
+        else: return any([NotamParseVisitor.has_descendant(c,desc_name) for c in node.children])
 
     def visit_simple_regex(self, node, _): return node.match.group(0)
+    visit_till_next_clause = visit_simple_regex
 
     def visit_code_node(self, *args, meanings):
         """Maps coded strings, where each character encodes a special meaning, into a corresponding decoded set
@@ -73,16 +77,25 @@ class NotamParseVisitor(parsimonious.NodeVisitor):
         codes = self.visit_simple_regex(*args)
         return set([meanings[code] for code in codes])
 
-    def visit_notamX_header(self, node, visited_children, notam_type):
-        """Common code shared by NOTAM[N|C|R] headers"""
-        self.notam_id = visited_children[0]
-        self.notam_type = notam_type
-        if self.notam_type in ('REPLACE', 'CANCEL'):
-            self.ref_notam_id = visited_children[-1]
+    def visit_intX(self, *args):
+        v = self.visit_simple_regex(*args)
+        return int(v)
 
-    def visit_notamn_header(self, *args): return self.visit_notamX_header(*args, notam_type='NEW')
-    def visit_notamr_header(self, *args): return self.visit_notamX_header(*args, notam_type='REPLACE')
-    def visit_notamc_header(self, *args): return self.visit_notamX_header(*args, notam_type='CANCEL')
+    visit_int2 = visit_intX
+    visit_int3 = visit_intX
+
+    @staticmethod
+    def visit_notamX_header(notam_type):
+        def inner(self, _, visited_children):
+            self.notam_id = visited_children[0]
+            self.notam_type = notam_type
+            if self.notam_type in ('REPLACE', 'CANCEL'):
+                self.ref_notam_id = visited_children[-1]
+        return inner
+
+    visit_notamn_header = visit_notamX_header.__func__('NEW')
+    visit_notamr_header = visit_notamX_header.__func__('REPLACE')
+    visit_notamc_header = visit_notamX_header.__func__('CANCEL')
 
     visit_icao_id = visit_simple_regex
     visit_notam_id = visit_simple_regex
@@ -136,17 +149,22 @@ class NotamParseVisitor(parsimonious.NodeVisitor):
                 dt = EstimatedDateTime(dt)
         self.valid_till = dt
 
+    def visit_d_clause(self, _, visited_children):
+        self.schedule = visited_children[2]
+
+    def visit_e_clause(self, _, visited_children):
+        self.body = visited_children[2]
+
+    def visit_f_clause(self, _, visited_children):
+        self.limit_lower = visited_children[2]
+
+    def visit_g_clause(self, _, visited_children):
+        self.limit_upper = visited_children[2]
+
     def visit_datetime(self, node, visited_children):
         dparts = visited_children
         dparts[0] = 1900 + dparts[0] if dparts[0] > 80 else 2000 + dparts[0] # interpret 2-digit year
         return datetime.datetime(*dparts, tzinfo=datetime.timezone.utc)
-
-    def visit_intX(self, *args):
-        v = self.visit_simple_regex(*args)
-        return int(v)
-
-    visit_int2 = visit_intX
-    visit_int3 = visit_intX
 
     def generic_visit(self, _, visited_children):
         return visited_children
