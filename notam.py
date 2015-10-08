@@ -3,6 +3,8 @@ import timeutils
 
 class Notam(object):
     def __init__(self):
+        self.full_text = None       # The full text of the NOTAM (for example, when constructed with from_str(s),
+                                    #  this will contain s.
         self.notam_id = None        # The series and number/year of this NOTAM.
         self.notam_type = None      # The NOTAM type: 'NEW', 'REPLACE', or 'CANCEL'.
         self.ref_notam_id = None    # If this  NOTAM references a previous NOTAM (notam_type is 'REPLACE' or 'CANCEL'),
@@ -33,6 +35,17 @@ class Notam(object):
         self.body = None            # Text of NOTAM; Plain-language Entry (using ICAO Abbreviations).
         self.limit_lower = None     # Textual specification of lower height limit of activities or restrictions.
         self.limit_upper = None     # Textual specification of upper height limits of activities or restrictions.
+
+        # The following contain [start,end) indices for their corresponding NOTAM items (if such exist).
+        # They can be used to index into Notam.full_text.
+        self.indices_item_a = None
+        self.indices_item_b = None
+        self.indices_item_c = None
+        self.indices_item_d = None
+        self.indices_item_e = None
+        self.indices_item_f = None
+        self.indices_item_g = None
+
 
     @staticmethod
     def from_str(s):

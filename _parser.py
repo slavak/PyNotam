@@ -124,9 +124,11 @@ class NotamParseVisitor(parsimonious.NodeVisitor):
             if n.expr_name == "icao_id": return [self.visit_simple_regex(n, [])]
             return sum([_dfs_icao_id(c) for c in n.children], []) # flatten list-of-lists
         self.tgt.location = _dfs_icao_id(node)
+        self.tgt.indices_item_a = (node.start, node.end)
 
     def visit_b_clause(self, node, visited_children):
         self.tgt.valid_from = visited_children[2]
+        self.tgt.indices_item_b = (node.start, node.end)
 
     def visit_c_clause(self, node, visited_children):
         if self.has_descendant(node, 'permanent'):
@@ -136,20 +138,25 @@ class NotamParseVisitor(parsimonious.NodeVisitor):
             if self.has_descendant(node, 'estimated'):
                 dt = timeutils.EstimatedDateTime(dt)
         self.tgt.valid_till = dt
+        self.tgt.indices_item_c = (node.start, node.end)
 
-    def visit_d_clause(self, _, visited_children):
+    def visit_d_clause(self, node, visited_children):
         self.tgt.schedule = visited_children[2]
+        self.tgt.indices_item_d = (node.start, node.end)
 
-    def visit_e_clause(self, _, visited_children):
+    def visit_e_clause(self, node, visited_children):
         self.tgt.body = visited_children[2]
+        self.tgt.indices_item_e = (node.start, node.end)
 
-    def visit_f_clause(self, _, visited_children):
+    def visit_f_clause(self, node, visited_children):
         self.tgt.limit_lower = visited_children[2]
+        self.tgt.indices_item_f = (node.start, node.end)
 
-    def visit_g_clause(self, _, visited_children):
+    def visit_g_clause(self, node, visited_children):
         self.tgt.limit_upper = visited_children[2]
+        self.tgt.indices_item_g = (node.start, node.end)
 
-    def visit_datetime(self, node, visited_children):
+    def visit_datetime(self, _, visited_children):
         dparts = visited_children
         dparts[0] = 1900 + dparts[0] if dparts[0] > 80 else 2000 + dparts[0] # interpret 2-digit year
         return timeutils.datetime(*dparts, tzinfo=timeutils.timezone.utc)
@@ -157,5 +164,5 @@ class NotamParseVisitor(parsimonious.NodeVisitor):
     def generic_visit(self, _, visited_children):
         return visited_children
 
-    def visit_root(self, _, __):
-        pass
+    def visit_root(self, node, _):
+        self.tgt.full_text = node.full_text
