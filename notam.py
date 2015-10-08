@@ -12,12 +12,12 @@ class Notam(object):
         self.fir = None             # The FIR within which the subject of the information is located.
         self.notam_code = None      # The five-letter NOTAM code, beginning with 'Q'. (Currently a simple str; at some
                                     #  point may be further parsed to specify the code's meaning.)
-        self.traffic_type = None    # List of affected traffic. Will contain one or more of:
+        self.traffic_type = None    # Set of affected traffic. Will contain one or more of:
                                     #  'IFR'/'VFR'/'CHECKLIST'.
-        self.purpose = None         # List of NOTAM purposes. Will contain one or more of:
+        self.purpose = None         # Set of NOTAM purposes. Will contain one or more of:
                                     #  'IMMEDIATE ATTENTION'/'OPERATIONAL SIGNIFICANCE'/'FLIGHT OPERATIONS'/
                                     #  'MISC'/'CHECKLIST'.
-        self.scope = None           # List of NOTAM scopes. Will contain one or more of:
+        self.scope = None           # Set of NOTAM scopes. Will contain one or more of:
                                     #  'AERODROME'/'EN-ROUTE'/'NAV WARNING'/'CHECKLIST'.
         self.fl_lower = None        # Lower vertical limit of NOTAM area of influence, expressed in flight levels (int).
         self.fl_upper = None        # Upper vertical limit of NOTAM area of influence, expressed in flight levels (int).
