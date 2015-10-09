@@ -9,7 +9,7 @@ class EstimatedDateTime(datetime):
         """May be initialized either identically to a regular datetime.datetime or, optionally, by
         providing an existing datetime object to copy."""
 
-        if not kwargs and len(args)==1 and isinstance(args[0], datetime.datetime):
+        if not kwargs and len(args)==1 and isinstance(args[0], datetime):
             other = args[0]
             v = super().__new__(cls, other.year, other.month, other.day,
                                      other.hour, other.minute, other.second,
