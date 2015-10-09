@@ -1,5 +1,8 @@
-import _parser
 import timeutils
+import _abbr
+import re as _re
+import _parser
+
 
 class Notam(object):
     def __init__(self):
@@ -54,3 +57,12 @@ class Notam(object):
         visitor = _parser.NotamParseVisitor(n)
         visitor.parse(s)
         return n
+
+    @staticmethod
+    def decode_abbr(txt):
+        """Decodes ICAO abbreviations in 'txt' to their un-abbreviated form."""
+        if not getattr(Notam.decode_abbr, 'regex', False):
+            Notam.decode_abbr.regex = _re.compile(r'\b(' +
+                                                  '|'.join([_re.escape(key) for key in _abbr.ICAO_abbr.keys()]) +
+                                                  r')\b')
+        return Notam.decode_abbr.regex.sub(lambda m: _abbr.ICAO_abbr[m.group()], txt)
