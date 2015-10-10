@@ -2,6 +2,7 @@ import timeutils
 import _abbr
 import re as _re
 import _parser
+from io import StringIO as _StringIO
 
 
 class Notam(object):
@@ -48,6 +49,26 @@ class Notam(object):
         self.indices_item_e = None
         self.indices_item_f = None
         self.indices_item_g = None
+
+
+    def decoded(self):
+        """Returns the full text of the NOTAM, with ICAO abbreviations decoded into their un-abbreviated
+        form where appropriate."""
+
+        with _StringIO() as sb:
+            indices = [getattr(self, 'indices_item_{}'.format(i)) for i in ('d', 'e', 'f', 'g')]
+            indices = [i for i in indices if i is not None]
+            indices.sort() # The items should already be listed in the order of their apperance in the text, but
+                           # we sort them here just in case
+            indices = [(0, 0)] + indices + [(-1, -1)]
+
+            for (cur, nxt) in zip(indices, indices[1:]):
+                (cs, ce) = cur
+                (ns, ne) = nxt
+                sb.write(self.decode_abbr(self.full_text[cs:ce]))   # decode the text of this range
+                sb.write(self.full_text[ce:ns])                     # copy the text from end of current range to start
+                                                                    # of next verbatim
+            return sb.getvalue()
 
 
     @staticmethod
