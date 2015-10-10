@@ -123,12 +123,16 @@ class NotamParseVisitor(parsimonious.NodeVisitor):
         def _dfs_icao_id(n):
             if n.expr_name == "icao_id": return [self.visit_simple_regex(n, [])]
             return sum([_dfs_icao_id(c) for c in n.children], []) # flatten list-of-lists
+
+        start = node.children[2].start
+        end = node.children[-1].end
         self.tgt.location = _dfs_icao_id(node)
-        self.tgt.indices_item_a = (node.start, node.end)
+        self.tgt.indices_item_a = (start, end)
 
     def visit_b_clause(self, node, visited_children):
         self.tgt.valid_from = visited_children[2]
-        self.tgt.indices_item_b = (node.start, node.end)
+        content_child = node.children[2]
+        self.tgt.indices_item_b = (content_child.start, content_child.end)
 
     def visit_c_clause(self, node, visited_children):
         if self.has_descendant(node, 'permanent'):
@@ -138,23 +142,28 @@ class NotamParseVisitor(parsimonious.NodeVisitor):
             if self.has_descendant(node, 'estimated'):
                 dt = timeutils.EstimatedDateTime(dt)
         self.tgt.valid_till = dt
-        self.tgt.indices_item_c = (node.start, node.end)
+        content_child = node.children[2]
+        self.tgt.indices_item_c = (content_child.start, content_child.end)
 
     def visit_d_clause(self, node, visited_children):
         self.tgt.schedule = visited_children[2]
-        self.tgt.indices_item_d = (node.start, node.end)
+        content_child = node.children[2]
+        self.tgt.indices_item_d = (content_child.start, content_child.end)
 
     def visit_e_clause(self, node, visited_children):
         self.tgt.body = visited_children[2]
-        self.tgt.indices_item_e = (node.start, node.end)
+        content_child = node.children[2]
+        self.tgt.indices_item_e = (content_child.start, content_child.end)
 
     def visit_f_clause(self, node, visited_children):
         self.tgt.limit_lower = visited_children[2]
-        self.tgt.indices_item_f = (node.start, node.end)
+        content_child = node.children[2]
+        self.tgt.indices_item_f = (content_child.start, content_child.end)
 
     def visit_g_clause(self, node, visited_children):
         self.tgt.limit_upper = visited_children[2]
-        self.tgt.indices_item_g = (node.start, node.end)
+        content_child = node.children[2]
+        self.tgt.indices_item_g = (content_child.start, content_child.end)
 
     def visit_datetime(self, _, visited_children):
         dparts = visited_children
