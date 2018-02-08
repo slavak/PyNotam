@@ -1,4 +1,6 @@
 # PyNotam
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fslavak%2FPyNotam.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fslavak%2FPyNotam?ref=badge_shield)
+
 **No**tice **T**o **A**ir**m**en Parser module written in Python.
 
 This provides a means to parse standard format ICAO NOTAMs, and extract useful information from them without having to do any string processing yourself.
@@ -49,3 +51,7 @@ Parsing grammar implemented with Erik Rose's excellent module [Parsimonious](htt
 ```
 > pip install parsimonious
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fslavak%2FPyNotam.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fslavak%2FPyNotam?ref=badge_large)
