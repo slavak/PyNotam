@@ -53,7 +53,7 @@ class TestNotam(unittest.TestCase):
             n = notam.Notam.from_str(notam_text)
             for (field, value) in expected.items():
                 with self.subTest(msg='Field "{}" of NOTAM "{}"'.format(field, notam_to_test)):
-                    self.assertEquals(getattr(n, field), value)
+                    self.assertEqual(getattr(n, field), value)
 
 
 if __name__ == '__main__':
